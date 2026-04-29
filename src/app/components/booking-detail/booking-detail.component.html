@@ -1,0 +1,84 @@
+@if (booking(); as b) {
+  <article class="booking-detail" aria-labelledby="booking-detail-title">
+    <button type="button" class="booking-detail__back" (click)="goBack()">
+      <span aria-hidden="true">←</span> Volver al listado
+    </button>
+
+    <header class="booking-detail__header">
+      <h2 id="booking-detail-title" class="booking-detail__title">{{ b.className }}</h2>
+      <p class="booking-detail__subtitle">Reservá tu cupo en pocos segundos.</p>
+    </header>
+
+    <dl class="booking-detail__meta">
+      <div>
+        <dt>Clase</dt>
+        <dd>{{ b.className }}</dd>
+      </div>
+      <div>
+        <dt>Profesor</dt>
+        <dd>{{ b.instructor }}</dd>
+      </div>
+      <div>
+        <dt>Horario</dt>
+        <dd>{{ b.schedule }}</dd>
+      </div>
+      <div>
+        <dt>Cupos</dt>
+        <dd>
+          @if (b.availableSpots > 0) {
+            {{ b.availableSpots }} disponibles
+          } @else {
+            <span class="booking-detail__sold-out">Sin cupos</span>
+          }
+        </dd>
+      </div>
+    </dl>
+
+    @if (status() === 'confirmed') {
+      <div class="booking-detail__confirmation" role="status">
+        <strong>¡Reserva confirmada!</strong>
+        <p>Te esperamos en {{ b.className }} ({{ b.schedule }}).</p>
+        <button type="button" class="booking-detail__primary" (click)="goBack()">
+          Volver al listado
+        </button>
+      </div>
+    } @else {
+      <form class="booking-detail__form" (ngSubmit)="reserve()">
+        <label class="booking-detail__field">
+          <span>Cupos a reservar</span>
+          <input
+            type="number"
+            min="1"
+            [max]="b.availableSpots"
+            [formControl]="spotsControl"
+            [disabled]="isSoldOut() || status() === 'submitting'"
+          />
+        </label>
+
+        @if (spotsControl.invalid && spotsControl.touched && !isSoldOut()) {
+          <p class="booking-detail__field-error">
+            Ingresá un número entre 1 y {{ b.availableSpots }}.
+          </p>
+        }
+
+        @if (errorMessage(); as message) {
+          <p class="booking-detail__error" role="alert">{{ message }}</p>
+        }
+
+        <button
+          type="submit"
+          class="booking-detail__primary"
+          [disabled]="isSoldOut() || status() === 'submitting' || spotsControl.invalid"
+        >
+          @if (status() === 'submitting') {
+            Reservando...
+          } @else if (isSoldOut()) {
+            Sin cupos
+          } @else {
+            Reservar
+          }
+        </button>
+      </form>
+    }
+  </article>
+}
