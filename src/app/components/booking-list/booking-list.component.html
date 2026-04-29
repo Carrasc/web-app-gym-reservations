@@ -11,9 +11,9 @@
       <span class="booking-list__spinner" aria-hidden="true"></span>
       <p>Cargando reservas...</p>
     </div>
-  } @else if (errorMessage(); as message) {
+  } @else if (errorMessage()) {
     <div class="booking-list__state booking-list__state--error" role="alert">
-      <p>{{ message }}</p>
+      <p>{{ errorMessage() }}</p>
       <button type="button" class="booking-list__retry" (click)="retry()">Reintentar</button>
     </div>
   } @else if (bookings().length === 0) {
